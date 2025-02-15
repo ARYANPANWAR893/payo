@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payo - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 🌟 Navbar -->
+    <nav class="bg-blue-600 text-white p-4 fixed top-0 w-full z-10 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <a href="{{ url_for('app.home') }}" class="text-2xl font-bold tracking-wide">Payo</a>
+            <div class="hidden md:flex space-x-6 text-lg">
+                <a href="{{ url_for('app.home') }}" class="hover:text-gray-200 transition">Home</a>
+                <a href="{{ url_for('app.payments') }}" class="hover:text-gray-200 transition">Payments</a>
+                <a href="{{ url_for('app.user_page') }}" class="hover:text-gray-200 transition">Profile</a>
+                <a href="{{ url_for('app.logout') }}" class="hover:text-gray-200 transition">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 📱 Mobile Bottom Navbar -->
+    <div class="md:hidden fixed bottom-0 w-full bg-blue-600 text-white flex justify-around p-3 shadow-lg">
+        <a href="{{ url_for('app.home') }}" class="flex flex-col items-center">
+            <span>🏠</span>
+            <span class="text-xs">Home</span>
+        </a>
+        <a href="{{ url_for('app.payments') }}" class="flex flex-col items-center">
+            <span>💰</span>
+            <span class="text-xs">Payments</span>
+        </a>
+        <a href="{{ url_for('app.user_page') }}" class="flex flex-col items-center">
+            <span>👤</span>
+            <span class="text-xs">Profile</span>
+        </a>
+    </div>
+
+    <!-- 🏠 Page Content -->
+    <div class="mt-20 md:mt-16 p-4 max-w-4xl mx-auto">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

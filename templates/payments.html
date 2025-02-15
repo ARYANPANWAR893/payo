@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+    <h2 class="text-xl font-bold">Send Money</h2>
+    <form method="POST" action="{{ url_for('app.send_money') }}">
+        <input type="email" name="email" placeholder="Recipient Email" required class="border p-2 w-full">
+        <input type="number" name="amount" placeholder="Amount" required class="border p-2 w-full mt-2">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Send</button>
+    </form>
+
+    <h2 class="mt-6 text-xl font-bold">Request Money</h2>
+    <form method="POST" action="{{ url_for('app.request_money') }}">
+        <input type="email" name="email" placeholder="Recipient Email" required class="border p-2 w-full">
+        <input type="number" name="amount" placeholder="Amount" required class="border p-2 w-full mt-2">
+        <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded mt-2">Request</button>
+    </form>
+</div>
+
+{% endblock %}

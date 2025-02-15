@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Link Bank Account{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-4">Link Your Bank Account</h2>
+    <form method="POST" action="{{ url_for('app.link_bank') }}">
+        <label class="block mb-2">Bank Name</label>
+        <input type="text" name="bank_name" required class="w-full p-2 border rounded-md">
+
+        <label class="block mt-4">Account Number</label>
+        <input type="text" name="account_number" required class="w-full p-2 border rounded-md">
+
+        <label class="block mt-4">IFSC Code</label>
+        <input type="text" name="ifsc_code" required class="w-full p-2 border rounded-md">
+
+        <label class="block mt-4">Account Type</label>
+        <select name="account_type" required class="w-full p-2 border rounded-md">
+            <option value="Savings">Savings</option>
+            <option value="Current">Current</option>
+        </select>
+
+        <label class="block mt-4">Branch Name</label>
+        <input type="text" name="branch_name" required class="w-full p-2 border rounded-md">
+
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md mt-4 hover:bg-blue-700">Link Account</button>
+    </form>
+</div>
+{% endblock %}

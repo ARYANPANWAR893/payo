@@ -1,22 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payo - Home</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center bg-white shadow-lg p-8 rounded-lg">
-        <h1 class="text-3xl font-bold text-gray-800">Welcome to Payo</h1>
-        <p class="text-gray-600 mt-2">Seamless and Secure Transactions</p>
-        <div class="mt-6">
-            <a href="{{ url_for('login') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Login</a>
-            <a href="{{ url_for('register') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg">Register</a>
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Balance Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md text-center relative">
+        <h2 class="text-xl font-bold">Balance</h2>
+        <p class="text-2xl font-semibold mt-2">${{ user.balance }}</p>
+        <div class="absolute top-2 right-2 flex gap-2">
+            <button onclick="togglePopup('addMoneyPopup')" class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">+</button>
+            <button onclick="togglePopup('withdrawMoneyPopup')" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">-</button>
         </div>
     </div>
-</body>
-</html>
+
+    <!-- Add Money Popup -->
+    <div id="addMoneyPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-xl font-bold">Add Money</h2>
+            <form method="POST" action="{{ url_for('app.add_money') }}">
+                <input type="number" name="amount" min="1" required class="border p-2 w-full rounded-md">
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg mt-2 hover:bg-green-600">Add</button>
+            </form>
+            <button onclick="togglePopup('addMoneyPopup')" class="text-red-500 mt-2">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Withdraw Money Popup -->
+    <div id="withdrawMoneyPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-xl font-bold">Withdraw Money</h2>
+            <form method="POST" action="{{ url_for('app.withdraw_money') }}">
+                <input type="number" name="amount" min="1" required class="border p-2 w-full rounded-md">
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg mt-2 hover:bg-red-600">Withdraw</button>
+            </form>
+            <button onclick="togglePopup('withdrawMoneyPopup')" class="text-gray-500 mt-2">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Pending Requests -->
+    {% if pending_requests %}
+    <div class="mt-6">
+        <h2 class="text-xl font-semibold">Pending Requests</h2>
+        {% for req in pending_requests[::-1] %}
+            <div class="bg-gray-200 p-4 rounded-lg mt-2 flex justify-between items-center">
+                <div>
+                    <p><strong>From:</strong> {{ req.sender_email }}</p>
+                    <p><strong>Amount:</strong> ${{ req.amount }}</p>
+                </div>
+                <form method="GET" action="/accept_request/{{req.id}}">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Accept</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Transactions Section -->
+    <h3 class="mt-6 text-lg font-bold">Transactions</h3>
+    <div class="mt-4 space-y-3">
+        {% for transaction in transactions[::-1] %}
+            <div class="p-4 rounded-lg shadow-md flex justify-between items-center 
+                {% if transaction.sender_id == user.id %} bg-red-100 {% else %} bg-green-100 {% endif %}">
+                <div>
+                    <p class="text-gray-700">
+                        {% if transaction.sender_id == user.id %}
+                            Sent to <span class="font-bold">{{ transaction.recipient.email }}</span>
+                        {% else %}
+                            Received from <span class="font-bold">{{ transaction.sender.email }}</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-gray-500 text-sm">{{ transaction.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                <p class="text-lg font-semibold">
+                    {% if transaction.sender_id == user.id %}
+                        - ${{ transaction.amount }}
+                    {% else %}
+                        + ${{ transaction.amount }}
+                    {% endif %}
+                </p>
+            </div>
+        {% else %}
+            <p class="text-gray-500">No transactions yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function togglePopup(popupId) {
+    document.getElementById(popupId).classList.toggle("hidden");
+}
+</script>
+
+<br><br><br><br>
+{% endblock %}

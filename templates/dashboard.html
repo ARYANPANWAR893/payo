@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payo - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-[system-ui]">
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ user.username }}</h1>
+        <p class="text-xl text-gray-700 mt-2">Balance: ${{ user.balance }}</p>
+
+        <!-- Add Money -->
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold">Add Money</h2>
+            <form method="POST" action="{{ url_for('add_money') }}" class="mt-2">
+                <input type="number" name="amount" min="1" placeholder="Amount (USD)" required class="w-full px-4 py-2 border rounded-lg">
+                <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg mt-2">Add Money</button>
+            </form>
+        </div>
+
+        <!-- Send Money -->
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold">Send Money</h2>
+            <form method="POST" action="{{ url_for('send_money') }}" class="mt-2">
+                <input type="email" name="email" placeholder="Recipient Email" required class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" name="amount" min="1" placeholder="Amount (USD)" required class="w-full px-4 py-2 border rounded-lg mt-2">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg mt-2">Send</button>
+            </form>
+        </div>
+
+        <!-- Request Money -->
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold">Request Money</h2>
+            <form method="POST" action="{{ url_for('request_money') }}" class="mt-2">
+                <input type="email" name="email" placeholder="Request From (Email)" required class="w-full px-4 py-2 border rounded-lg">
+                <input type="number" name="amount" min="1" placeholder="Amount (USD)" required class="w-full px-4 py-2 border rounded-lg mt-2">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-2">Request</button>
+            </form>
+        </div>
+
+        <!-- Pending Money Requests -->
+        {% if money_requests %}
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold">Pending Requests</h2>
+            {% for req in money_requests %}
+                <div class="bg-gray-200 p-4 rounded-lg mt-2">
+                    <p><strong>From:</strong> {{ req.sender.username }}</p>
+                    <p><strong>Amount:</strong> ${{ req.amount }}</p>
+                    <form method="POST" action="{{ url_for('handle_request', request_id=req.id, action='accept') }}" class="inline">
+                        <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-lg mt-2">Accept</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('handle_request', request_id=req.id, action='reject') }}" class="inline">
+                        <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-lg mt-2">Reject</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('home') }}" class="block text-center mt-6 text-red-600 font-semibold">Logout</a>
+    </div>
+</body>
+</html>

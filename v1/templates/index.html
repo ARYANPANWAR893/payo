@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { width: 50%; margin: auto; }
+        .block { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Blockchain Explorer</h1>
+    <h2>Mine a New Block</h2>
+    <a href="/mine_block"><button>Mine Block</button></a>
+    
+    <h2>Add a Transaction</h2>
+    <form action="/add_transaction" method="POST">
+        <input type="text" name="sender" placeholder="Sender" required>
+        <input type="text" name="receiver" placeholder="Receiver" required>
+        <input type="number" name="amount" placeholder="Amount" required>
+        <button type="submit">Add Transaction</button>
+    </form>
+    
+    <h2>Blockchain</h2>
+    <div class="container">
+        {% for block in chain %}
+            <div class="block">
+                <p><strong>Index:</strong> {{ block.index }}</p>
+                <p><strong>Timestamp:</strong> {{ block.timestamp }}</p>
+                <p><strong>Transactions:</strong> {{ block.transactions }}</p>
+                <p><strong>Proof:</strong> {{ block.proof }}</p>
+                <p><strong>Previous Hash:</strong> {{ block.previous_hash }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

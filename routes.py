@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import stripe
+from models import REMITTANCE_FEES
 from models import db, User, Transaction, MoneyRequest, add_block, remove_block, BankAccount
 
 app = Blueprint('app', __name__)
@@ -103,20 +104,22 @@ def send_money():
     if sender.balance < amount:
         print("Insufficient Balance!", "danger")
         return redirect(url_for('app.payments'))
+    
+    fee = round(amount * 0.005, 2)
 
     # Deduct sender balance & add to recipient
     sender.balance -= amount
-    recipient.balance += amount
+    recipient.balance += amount-fee
 
     # Apply 0.5% transaction fee
-    fee = round(amount * 0.005, 2)
+    
     remove_block(sender_id, fee)  # Remove fee blocks
 
     # Update Blockchain
     remove_block(sender_id, amount)
     add_block(recipient.id, amount)
 
-    transaction = Transaction(sender_id=sender.id, recipient_id=recipient.id, amount=amount)
+    transaction = Transaction(sender_id=sender.id, recipient_id=recipient.id, amount=amount-fee)
     db.session.add(transaction)
     db.session.commit()
 
@@ -176,8 +179,8 @@ def accept_request(request_id):
     db.session.commit()
 
     # Apply a 0.5% transaction fee (for blockchain fee purposes)
-    # fee = round(money_request.amount * 0.005, 2)
-    # remove_block(payer.id, fee)  # Remove fee blocks from payer
+    fee = round(money_request.amount * 0.005, 2)
+    remove_block(requester.id, fee)  # Remove fee blocks from payer
 
     # # Update Blockchain: remove blocks equal to the requested amount from payer, and add blocks for requester
     # remove_block(payer.id, money_request.amount)
@@ -212,6 +215,15 @@ def payments():
 
     return render_template('payments.html', user=user, transactions=transactions, people=people)
 
+COUNTRY_CODES = {
+    "Bahrain": "bh", "Kuwait": "kw", "Oman": "om", "Qatar": "qa", "Saudi Arabia": "sa", "United Arab Emirates": "ae",
+    "Jordan": "jo", "Lebanon": "lb", "Maldives": "mv", "Sri Lanka": "lk", "Bangladesh": "bd", "Philippines": "ph",
+    "Malaysia": "my", "Thailand": "th", "Vietnam": "vn", "Indonesia": "id", "Cambodia": "kh", "Myanmar": "mm",
+    "Laos": "la", "Taiwan": "tw", "Brunei": "bn", "Mongolia": "mn", "Afghanistan": "af", "Kazakhstan": "kz",
+    "Cyprus": "cy", "Hong Kong": "hk", "Singapore": "sg", "Switzerland": "ch", "Monaco": "mc"
+}
+
+
 # ✅ User Page
 @app.route('/user')
 def user_page():
@@ -221,7 +233,7 @@ def user_page():
         return redirect(url_for('app.login'))
     
     user = User.query.get(user_id)
-    return render_template('user.html', user=user, linked_accounts=banks)
+    return render_template('user.html', user=user, linked_accounts=banks, fees=REMITTANCE_FEES, country_codes=COUNTRY_CODES)
 
 # ✅ Login
 @app.route('/login', methods=['GET', 'POST'])
@@ -246,8 +258,10 @@ def signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        country = request.form['country']
+        language = request.form['language']
         
-        new_user = User(username=username, email=email, password=password)
+        new_user = User(username=username, email=email, password=password, country=country, language=language)
         db.session.add(new_user)
         db.session.commit()
         

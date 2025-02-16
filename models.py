@@ -10,6 +10,8 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     balance = db.Column(db.Float, default=0.0)
+    language = db.Column(db.String(10), default="en")
+    country = db.Column(db.String(100), nullable=False)
 
     sent_transactions = db.relationship('Transaction', 
                                         foreign_keys='Transaction.sender_id', 
@@ -25,6 +27,8 @@ class User(db.Model):
                                      foreign_keys='MoneyRequest.recipient_id', 
                                      backref='request_recipient', 
                                      lazy=True)
+
+    bank_accounts = db.relationship('BankAccount', backref='user', lazy=True)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -118,4 +122,10 @@ class BankAccount(db.Model):
     account_type = db.Column(db.String(20), nullable=False)  # Savings, Current, etc.
     branch_name = db.Column(db.String(100), nullable=False)
 
-    user = db.relationship('User', backref=db.backref('bank_accounts', lazy=True))
+REMITTANCE_FEES = {
+    "Bahrain": 0.5, "Kuwait": 0.5, "Oman": 0.5, "Qatar": 0.5, "Saudi Arabia": 0.5, "United Arab Emirates": 0.5,
+    "Jordan": 0.5, "Lebanon": 0.5, "Maldives": 0.5, "Sri Lanka": 0.5, "Bangladesh": 0.5, "Philippines": 0.5,
+    "Malaysia": 0.5, "Thailand": 0.5, "Vietnam": 0.5, "Indonesia": 0.5, "Cambodia": 0.5, "Myanmar": 0.5,
+    "Laos": 0.5, "Taiwan": 0.5, "Brunei": 0.5, "Mongolia": 0.5, "Afghanistan": 0.5, "Kazakhstan": 0.5,
+    "Cyprus": 0.5, "Hong Kong": 0.5, "Singapore": 0.5, "Switzerland": 0.5, "Monaco": 0.5
+}

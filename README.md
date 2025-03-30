@@ -93,7 +93,3 @@ flask run
 
 ## 📜 License
 Payo is released under the **MIT License**.
-
-## 📩 Contact
-For support or inquiries, reach out at [**support@payo.com**](mailto:support@payo.com).
-
